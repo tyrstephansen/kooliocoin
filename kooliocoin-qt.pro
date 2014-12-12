@@ -1,10 +1,27 @@
 TEMPLATE = app
 TARGET = kooliocoin-qt
 macx:TARGET = "Kooliocoin-Qt"
-VERSION = 0.8.7.2
+VERSION = 0.8.7.3
 INCLUDEPATH += src src/json src/qt
 QT += core gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+mac {
+LIBS += -ldb_cxx$$BDB_LIB_SUFFIX
+
+# Bundle OSX dependencies
+QMAKE_POST_LINK += macdeployqt $$OUT_PWD/kooliocoin-qt.app;
+QMAKE_POST_LINK += cp /opt/local/lib/db48/libdb_cxx-4.8.dylib $$OUT_PWD/kooliocoin-qt.app/Contents/Frameworks/libdb_cxx-4.8.dylib;
+QMAKE_POST_LINK += install_name_tool -change /opt/local/lib/db48/libdb_cxx-4.8.dylib @executable_path/../Frameworks/libdb_cxx-4.8.dylib $$OUT_PWD/kooliocoin-qt.app/Contents/MacOS/kooliocoin-qt;
+QMAKE_POST_LINK += install_name_tool -id @executable_path/../Frameworks/libdb_cxx-4.8.dylib $$OUT_PWD/kooliocoin-qt.app/Contents/Frameworks/libdb_cxx-4.8.dylib;
+
+# Create DMG file
+QMAKE_POST_LINK += mkdir $$OUT_PWD/kooliocoin-qt.app;
+QMAKE_POST_LINK += cp -R $$OUT_PWD/kooliocoin-qt.app $$OUT_PWD/kooliocoin-qt/kooliocoin-qt.app;
+QMAKE_POST_LINK += hdiutil create $$OUT_PWD/kooliocoin-qt -srcfolder $$OUT_PWD/kooliocoin-qt -volname kooliocoin-qt -format UDBZ;
+QMAKE_POST_LINK += rm -R $$OUT_PWD/kooliocoin-qt;
+}
+
 #DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
 DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE BOOST_THREAD_PROVIDES_GENERIC_SHARED_MUTEX_ON_WIN __NO_SYSTEM_INCLUDES
 CONFIG += no_include_pwd
