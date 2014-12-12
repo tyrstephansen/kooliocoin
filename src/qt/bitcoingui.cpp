@@ -43,7 +43,11 @@
 #include <QDragEnterEvent>
 #if QT_VERSION < 0x050000
 #include <QUrl>
+#include <QTextDocument>
+#else
+#include <QUrlQuery>
 #endif
+
 #include <QMimeData>
 #include <QStyle>
 #include <QSettings>
